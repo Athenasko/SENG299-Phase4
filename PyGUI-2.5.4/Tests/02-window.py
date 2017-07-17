@@ -1,15 +1,9 @@
-#copied Socket Client segement 
-import socket
-#s = socket.socket()
-#host = socket.gethostname()
-#port = 9999
-#address = (host, port)
-#msg = 'test 123'
-#s.connect(address)
-#s.send(msg)
+#
+#   Python GUI - Test windows
+#
 
 from GUI import Window, run
-#from testing import say
+from testing import say
 
 class TestWindow(Window):
 
@@ -30,7 +24,7 @@ class TestWindow(Window):
         say(self.name, "Key up:", event)
         print
 
-win1 = TestWindow(title = "Chatcity!", 
+win1 = TestWindow(title = "Hello PyGUI!", 
     bounds = (50, 70, 250, 270),
     auto_position = False)
 win1.name = "Win1"
@@ -56,8 +50,8 @@ window in which the preceding mouse down event occurred, and should be reported
 even if the mouse is moved outside the original window.
 """
 
-#say(instructions)
-#say("win1 position =", win1.position, "size =", win1.size)
-#say("win2 position =", win2.position, "size =", win2.size)
+say(instructions)
+say("win1 position =", win1.position, "size =", win1.size)
+say("win2 position =", win2.position, "size =", win2.size)
 
 run()
