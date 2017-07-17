@@ -2,7 +2,7 @@ from GUI import Window, View, application, rgb
 from GUI.Geometry import offset_rect, rect_sized
 from GUI.StdColors import yellow
 from GUI.PIL import image_from_pil_image
-import Image
+from PIL import Image
 from testing import say
 
 from GUI import PIL
