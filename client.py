@@ -23,6 +23,7 @@ current_alias = "Bob"
 
 here = sys.path[0]
 image_path = os.path.join(here, "city_background.jpg")
+calgary_path = os.path.join(here, "Calgary_background.jpg")
 background_image = Image(file = image_path)
 
 
@@ -33,6 +34,7 @@ def founded_city(): #possibly consider making a function for disabling buttons t
     global current_city
     current_city = free_cities[create_list_button.value]
     print "Founded the city of", current_city
+    switch_background()
     taken_cities.append(current_city)
     del free_cities[create_list_button.value]
     remove_window()
@@ -43,6 +45,7 @@ def founded_city(): #possibly consider making a function for disabling buttons t
     join_list_button.enabled = 0
     join_button.enabled = 0
     create_button.enabled = 0
+    leave_button.enabled = 1
 
 def joined_city():
     global free_room_counter
@@ -51,12 +54,14 @@ def joined_city():
     global current_city
     current_city = taken_cities[join_list_button.value]
     print "Moved to the city of", current_city
+    switch_background()
     remove_window()
     refresh_buttons()
     join_list_button.enabled = 0
     create_list_button.enabled = 0
     join_button.enabled = 0
     create_button.enabled = 0
+    leave_button.enabled = 1
     #DEBUG print taken_cities
     #DEBUG print free_cities
 
@@ -69,15 +74,35 @@ def occupied_city_list(): # enables the list
 def leave_city():
     global current_city
     current_city = "Earth"
+    switch_background()
     remove_window()
     refresh_buttons()
     join_button.enabled = 1
     create_button.enabled = 1
     join_list_button.enabled = 0
     create_list_button.enabled = 0
+    leave_button.enabled = 0
    
-def send_message():
+def send_message(): #need to implement 
     pass
+
+def switch_background():
+    global current_city
+    global view
+    global background_image
+    print current_city
+    if current_city == "Calgary":
+       background_image = Image(file = calgary_path)
+    #elif current_city == "":
+    #   background_image = Image(file = _path)
+    else:
+        background_image = Image(file = image_path)
+    view = ImageTestView(size = window.size)
+    print "changed the view"
+    pass
+ 
+    #view = ImageTestView(size = window.size)
+
 
 join_button = Button(position = (30, 30), 
         title = "Join City", 
@@ -102,13 +127,14 @@ leave_button = Button(position = (600, 30),
     action = leave_city, 
     style = 'cancel') 
 
-send_button = Button(position = (610,600),
+send_button = Button(position = (610,690),
     title = "Send Message",
     action = send_message,
     style = 'default')
 
 join_list_button.enabled = 0
 create_list_button.enabled = 0
+leave_button.enabled = 0
 
 def refresh_buttons():
     global join_button
@@ -144,12 +170,22 @@ def refresh_buttons():
         style = 'cancel')   
 
     window.room_field = TestTextField(3,
-    position = (30, 170),
-    width = 200,
+    position = (30, 260),
+    width = 300,
     editable = False,
-    value = current_city)
+    value = current_alias + " currently resides in " + current_city)
+
+    window.output_field = TestTextField(2, #output
+    position = (30, 290),
+    width = 700,
+    height = 400,
+    editable = False,
+    value = "Welcome to " + current_city) # have value change with input from other people 
 
     create_window() 
+
+def refresh output(): #going to require this to constantly feed the output from the server to the user
+    pass
 
 class TestWindow(Window):
 
@@ -190,7 +226,7 @@ class ImageTestView(View):
     def draw(self, c, r):
         c.backcolor = blue
         c.erase_rect(r)
-        main_image_pos = (10, 10)
+        main_image_pos = (20, 10)
         src_rect = rect_sized((10,10), (4000,4000))
         #src_rect = rect_sized((180, 160), (100, 100))
         dst_rect = offset_rect(src_rect, main_image_pos)
@@ -210,17 +246,21 @@ def create_window():
     window.add(window.output_field)
     window.add(window.room_field)
     window.add(send_button)
-    window.add(window.alias)
+    #window.add(window.alias)
     window.show()
 
 def remove_window():
+    window.remove(view)
     window.remove(join_button)
     window.remove(join_list_button)
     window.remove(create_button)
     window.remove(create_list_button)
     window.remove(leave_button)
     window.remove(window.room_field)
-
+    window.remove(window.input_field)
+    window.remove(window.output_field)
+    window.remove(window.room_field)
+    window.remove(send_button)
 
 window = TestWindow(title = "Chatcity!", 
     bounds = (50, 70, 810, 800),
@@ -229,27 +269,27 @@ window = TestWindow(title = "Chatcity!",
 view = ImageTestView(size = window.size)
 
 window.input_field = TestTextField(1, #input
-    position = (30, 600),
+    position = (30, 690),
     width = 580)
 
 window.output_field = TestTextField(2, #output
-    position = (30, 200),
+    position = (30, 290),
     width = 700,
     height = 400,
     editable = False,
-    value = "Read Only") # have value change with input from other people 
+    value = "Welcome to " + current_city) # have value change with input from other people 
 
 window.room_field = TestTextField(3,
-    position = (30, 170),
-    width = 200,
+    position = (30, 260),
+    width = 300,
     editable = False,
-    value = current_city)
+    value = current_alias + " currently resides in " + current_city)
 
-window.alias = TestTextField(4,
-    position = (230, 170),
-    width = 200,
-    editable = False,
-    value = current_alias)
+#window.alias = TestTextField(4, #consider condensing this with the alias textfield, and add phrase such as alias currently resides in city
+ #   position = (230, 170),
+  #  width = 200,
+   # editable = False,
+    #value = current_alias)
 
 create_window()
 
