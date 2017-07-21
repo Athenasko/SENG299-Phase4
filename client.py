@@ -184,7 +184,7 @@ def refresh_buttons():
 
     create_window() 
 
-def refresh output(): #going to require this to constantly feed the output from the server to the user
+def refresh_output(): #going to require this to constantly feed the output from the server to the user
     pass
 
 class TestWindow(Window):
@@ -264,7 +264,8 @@ def remove_window():
 
 window = TestWindow(title = "Chatcity!", 
     bounds = (50, 70, 810, 800),
-    auto_position = False)
+    auto_position = False,
+    resizable = 0)
 
 view = ImageTestView(size = window.size)
 
