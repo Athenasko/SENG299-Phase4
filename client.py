@@ -93,7 +93,7 @@ leave_button = Button(position = (600, 30),
     action = leave_city, 
     style = 'cancel') 
 
-send_button = Button(position = (550,600),
+send_button = Button(position = (610,600),
     title = "Send Message",
     action = send_message,
     style = 'default')
@@ -194,12 +194,12 @@ def remove_window():
 
 
 window = TestWindow(title = "Chatcity!", 
-    bounds = (50, 70, 900, 800),
+    bounds = (50, 70, 810, 800),
     auto_position = False)
 
 window.input_field = TestTextField(1, #input
     position = (30, 600),
-    width = 600)
+    width = 580)
 
 window.output_field = TestTextField(2, #output
     position = (30, 200),
@@ -212,7 +212,7 @@ window.room_field = TestTextField(3,
     position = (30, 170),
     width = 100,
     editable = False,
-    value = "curent_city")
+    value = current_city)
 
 create_window()
 
