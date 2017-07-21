@@ -8,7 +8,7 @@ import socket
 #s.connect(address)
 #s.send(msg)
 
-from GUI import Window, Button, Font, ListButton, application
+from GUI import Window, Button, Font, ListButton, application, TextField
 from GUI.StdFonts import system_font
 from GUI.StdColors import red, black
 from testing import say
@@ -23,6 +23,7 @@ def founded_city(): #possibly consider making a function for disabling buttons t
     global free_room_counter
     global free_cities
     global taken_cities
+    global current_city
     current_city = free_cities[create_list_button.value]
     print "Founded the city of", current_city
     taken_cities.append(current_city)
@@ -40,6 +41,7 @@ def joined_city():
     global free_room_counter
     global free_cities
     global taken_cities
+    global current_city
     current_city = taken_cities[join_list_button.value]
     print "Moved to the city of", current_city
     remove_window()
@@ -60,6 +62,9 @@ def occupied_city_list(): # enables the list
 def leave_city():
     join_button.enabled = 1
     create_button.enabled = 1
+
+def send_message():
+    pass
 
 join_button = Button(position = (30, 30), 
         title = "Join City", 
@@ -87,6 +92,11 @@ leave_button = Button(position = (600, 30),
     title = "Leave City", 
     action = leave_city, 
     style = 'cancel') 
+
+send_button = Button(position = (700,600),
+    title = "Send Message",
+    action = send_message,
+    style = 'default')
 
 join_list_button.enabled = 0
 create_list_button.enabled = 0
@@ -148,12 +158,30 @@ class TestWindow(Window):
         say(self.name, "Key up:", event)
         print
 
+class TestTextField(TextField):
+
+    def __init__(self, number, *args, **kwds):
+        TextField.__init__(self, *args, **kwds)
+        self.number = number
+    
+    def do_text_changed_action(self):
+        print "Field %s text changed" % self.number
+    
+    def targeted(self):
+        print "Field %s targeted" % self.number
+
+    def untargeted(self):
+        print "Field %s untargeted" % self.number
+
 def create_window():
     window.add(join_button)
     window.add(join_list_button)
     window.add(create_button)
     window.add(create_list_button)
     window.add(leave_button)
+    window.add(window.input_field)
+    window.add(window.output_field)
+    window.add(window.room_field)
     window.show()
 
 def remove_window():
@@ -167,6 +195,23 @@ def remove_window():
 window = TestWindow(title = "Chatcity!", 
     bounds = (50, 70, 1800, 800),
     auto_position = False)
+
+window.input_field = TestTextField(1, #input
+    position = (30, 600),
+    width = 1600)
+
+window.output_field = TestTextField(2, #output
+    position = (30, 200),
+    width = 1600,
+    height = 400,
+    editable = False,
+    value = "Read Only") # have value change with input from other people 
+
+window.room_field = TestTextField(3,
+    position = (30, 170),
+    width = 100,
+    editable = False,
+    value = "curent_city")
 
 create_window()
 
