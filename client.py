@@ -93,7 +93,7 @@ leave_button = Button(position = (600, 30),
     action = leave_city, 
     style = 'cancel') 
 
-send_button = Button(position = (700,600),
+send_button = Button(position = (550,600),
     title = "Send Message",
     action = send_message,
     style = 'default')
@@ -182,6 +182,7 @@ def create_window():
     window.add(window.input_field)
     window.add(window.output_field)
     window.add(window.room_field)
+    window.add(send_button)
     window.show()
 
 def remove_window():
@@ -193,16 +194,16 @@ def remove_window():
 
 
 window = TestWindow(title = "Chatcity!", 
-    bounds = (50, 70, 1800, 800),
+    bounds = (50, 70, 900, 800),
     auto_position = False)
 
 window.input_field = TestTextField(1, #input
     position = (30, 600),
-    width = 1600)
+    width = 600)
 
 window.output_field = TestTextField(2, #output
     position = (30, 200),
-    width = 1600,
+    width = 700,
     height = 400,
     editable = False,
     value = "Read Only") # have value change with input from other people 
