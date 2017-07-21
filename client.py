@@ -9,7 +9,7 @@
 
 import socket
 import os, sys
-from GUI import Window, Button, Font, ListButton, application, TextField, view, Image
+from GUI import Window, Button, Font, ListButton, application, TextField, View, Image
 from GUI.Geometry import offset_rect, rect_sized
 from GUI.StdFonts import system_font
 from GUI.StdColors import red,black,yellow,blue 
@@ -22,8 +22,9 @@ current_city = "Earth"
 current_alias = "Bob"
 
 here = sys.path[0]
-image_path = os.path.join(here, "imac.jpg")
+image_path = os.path.join(here, "city_background.jpg")
 background_image = Image(file = image_path)
+
 
 def founded_city(): #possibly consider making a function for disabling buttons to reduce code copyingg
     global free_room_counter
@@ -187,27 +188,19 @@ class TestTextField(TextField):
 class ImageTestView(View):
 
     def draw(self, c, r):
-        c.backcolor = yellow
+        c.backcolor = blue
         c.erase_rect(r)
         main_image_pos = (10, 10)
-        src_rect = image.bounds
-        #say("Image bounds =", src_rect)
+        src_rect = rect_sized((10,10), (4000,4000))
+        #src_rect = rect_sized((180, 160), (100, 100))
         dst_rect = offset_rect(src_rect, main_image_pos)
-        #say("Drawing", src_rect, "in", dst_rect)
-        image.draw(c, src_rect, dst_rect)
-        src_rect = rect_sized((180, 160), (100, 100))
-        c.frame_rect(offset_rect(src_rect, main_image_pos))
-        dst_rect = rect_sized((10, 340), (150, 150))
-        #say("Drawing", src_rect, "in", dst_rect)
-        image.draw(c, src_rect, dst_rect)
-        dst_rect = rect_sized((200, 340), (100, 100))
-        #say("Drawing", src_rect, "in", dst_rect)
-        image.draw(c, src_rect, dst_rect)
-        dst_rect = rect_sized((340, 340), (50, 50))
-        #say("Drawing", src_rect, "in", dst_rect)
-        image.draw(c, src_rect, dst_rect)
+        #dst_rect = rect_sized((10, 340), (150, 150))
+        #dst_rect = rect_sized((200, 340), (100, 100))
+        #dst_rect = rect_sized((10, 10), (800, 790))
+        background_image.draw(c, src_rect, dst_rect)
 
 def create_window():
+    window.add(view)
     window.add(join_button)
     window.add(join_list_button)
     window.add(create_button)
@@ -232,6 +225,8 @@ def remove_window():
 window = TestWindow(title = "Chatcity!", 
     bounds = (50, 70, 810, 800),
     auto_position = False)
+
+view = ImageTestView(size = window.size)
 
 window.input_field = TestTextField(1, #input
     position = (30, 600),
