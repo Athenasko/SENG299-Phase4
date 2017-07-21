@@ -1,5 +1,4 @@
 #copied Socket Client segement 
-import socket
 #s = socket.socket()
 #host = socket.gethostname()
 #port = 9999
@@ -8,16 +7,23 @@ import socket
 #s.connect(address)
 #s.send(msg)
 
-from GUI import Window, Button, Font, ListButton, application, TextField
+import socket
+import os, sys
+from GUI import Window, Button, Font, ListButton, application, TextField, view, Image
+from GUI.Geometry import offset_rect, rect_sized
 from GUI.StdFonts import system_font
-from GUI.StdColors import red, black
+from GUI.StdColors import red,black,yellow,blue 
 from testing import say
 
 free_cities = ["Detorit" , "Montreal", "Vancouver", "Victoria", "Calgary", "Edmonton", "Quebec City", "Ottawa", "Toronto", "Winipeg", "Churchill", "Saskatoon", "Regina", "Yellowknife", "Whitehorse", "Dawson City", "Fort Simson", "Iqaluit", "Resolute", "Fredrickton", "Saint John", "Halifax", "Dartmouth", "St. Johns", "Grand Falls-Windsor", "Charlottetown", "Summerside"]
-
 taken_cities = []
 
 current_city = "Earth"
+current_alias = "Bob"
+
+here = sys.path[0]
+image_path = os.path.join(here, "imac.jpg")
+background_image = Image(file = image_path)
 
 def founded_city(): #possibly consider making a function for disabling buttons to reduce code copyingg
     global free_room_counter
@@ -60,9 +66,15 @@ def occupied_city_list(): # enables the list
     join_list_button.enabled = 1
 
 def leave_city():
+    global current_city
+    current_city = "Earth"
+    remove_window()
+    refresh_buttons()
     join_button.enabled = 1
     create_button.enabled = 1
-
+    join_list_button.enabled = 0
+    create_list_button.enabled = 0
+   
 def send_message():
     pass
 
@@ -75,16 +87,12 @@ join_list_button = ListButton(position = (30, join_button.bottom + 30),
     titles = ["Move to %s" % i for i in taken_cities], #need to add so only occupied free_cities are avaliable to be moved to
     action = joined_city)
 
-    # create_button for creating a city
-
-create_button = Button(position = (300, 30),
+create_button = Button(position = (300, 30), # create_button for creating a city
     title = "Create City", 
     action = empty_city_list, 
     style = 'cancel')
 
-    #button 4 for list of not yet created free_cities
-
-create_list_button = ListButton(position = (300, create_button.bottom + 30), 
+create_list_button = ListButton(position = (300, create_button.bottom + 30), #button 4 for list of not yet created free_cities
     titles = ["Found %s" % i for i in free_cities], #need to add so only occupied free_cities are avaliable to be moved to
     action = founded_city)
 
@@ -109,6 +117,7 @@ def refresh_buttons():
     global leave_button
     global free_cities
     global taken_cities
+    global window
 
     join_button = Button(position = (30, 30), 
         title = "Join City", 
@@ -119,14 +128,10 @@ def refresh_buttons():
         titles = ["Move to %s" % i for i in taken_cities], #need to add so only occupied free_cities are avaliable to be moved to
         action = joined_city)
 
-    # create_button for creating a city
-
     create_button = Button(position = (300, 30),
         title = "Create City", 
         action = empty_city_list, 
         style = 'cancel')
-
-    #button 4 for list of not yet created free_cities
 
     create_list_button = ListButton(position = (300, create_button.bottom + 30), 
         titles = ["Found %s" % i for i in free_cities], #need to add so only occupied free_cities are avaliable to be moved to
@@ -136,6 +141,12 @@ def refresh_buttons():
         title = "Leave City", 
         action = leave_city, 
         style = 'cancel')   
+
+    window.room_field = TestTextField(3,
+    position = (30, 170),
+    width = 200,
+    editable = False,
+    value = current_city)
 
     create_window() 
 
@@ -173,6 +184,29 @@ class TestTextField(TextField):
     def untargeted(self):
         print "Field %s untargeted" % self.number
 
+class ImageTestView(View):
+
+    def draw(self, c, r):
+        c.backcolor = yellow
+        c.erase_rect(r)
+        main_image_pos = (10, 10)
+        src_rect = image.bounds
+        #say("Image bounds =", src_rect)
+        dst_rect = offset_rect(src_rect, main_image_pos)
+        #say("Drawing", src_rect, "in", dst_rect)
+        image.draw(c, src_rect, dst_rect)
+        src_rect = rect_sized((180, 160), (100, 100))
+        c.frame_rect(offset_rect(src_rect, main_image_pos))
+        dst_rect = rect_sized((10, 340), (150, 150))
+        #say("Drawing", src_rect, "in", dst_rect)
+        image.draw(c, src_rect, dst_rect)
+        dst_rect = rect_sized((200, 340), (100, 100))
+        #say("Drawing", src_rect, "in", dst_rect)
+        image.draw(c, src_rect, dst_rect)
+        dst_rect = rect_sized((340, 340), (50, 50))
+        #say("Drawing", src_rect, "in", dst_rect)
+        image.draw(c, src_rect, dst_rect)
+
 def create_window():
     window.add(join_button)
     window.add(join_list_button)
@@ -183,6 +217,7 @@ def create_window():
     window.add(window.output_field)
     window.add(window.room_field)
     window.add(send_button)
+    window.add(window.alias)
     window.show()
 
 def remove_window():
@@ -191,6 +226,7 @@ def remove_window():
     window.remove(create_button)
     window.remove(create_list_button)
     window.remove(leave_button)
+    window.remove(window.room_field)
 
 
 window = TestWindow(title = "Chatcity!", 
@@ -210,9 +246,15 @@ window.output_field = TestTextField(2, #output
 
 window.room_field = TestTextField(3,
     position = (30, 170),
-    width = 100,
+    width = 200,
     editable = False,
     value = current_city)
+
+window.alias = TestTextField(4,
+    position = (230, 170),
+    width = 200,
+    editable = False,
+    value = current_alias)
 
 create_window()
 
