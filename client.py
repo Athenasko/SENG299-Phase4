@@ -1,19 +1,54 @@
-#copied Socket Client segement 
+#chat_client.py
+
+import sys
 import socket
+import select
+ 
+def chat_client():
+	if(len(sys.argv) < 3):
+		print 'Usage : python chat_client.py hostname port'
+		sys.exit()
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = socket.gethostname()
-port = 9999
+	host = sys.argv[1]
+	port = int(sys.argv[2])
+     
+	server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	server_socket.settimeout(2)
+     
+	#connect to remote host
+	try:
+		server_socket.connect((host, port))
+	except:
+		print 'Unable to connect'
+		sys.exit()
+     
+	print 'Connected to remote host. You can start sending messages'
+	sys.stdout.write('[Me] '); sys.stdout.flush()
+     
+	while 1:
+		socket_list = [sys.stdin, server_socket]
+         
+		#Get the list sockets which are readable
+		ready_for_reading, ready_for_writing, error_condition = select.select(socket_list , [], [])
+         
+		for sock in ready_for_reading:             
+			if sock == server_socket:
+				#incoming message from remote server, server_socket
+				data = sock.recv(4096)
+				if not data:
+					print '\nDisconnected from chat server'
+					sys.exit()
+				else:
+					#print data
+					sys.stdout.write(data)
+					sys.stdout.write('[Me] '); sys.stdout.flush()     
+            
+			else:
+				#user entered a message
+				message_data = sys.stdin.readline()
+				server_socket.send(message_data)
+				sys.stdout.write('[Me] '); sys.stdout.flush() 
 
-address = (host, port)
+if __name__ == "__main__":
 
-while True:
-	s.connect(address)
-	#try:
-	#	alias = raw_input("Please input an alias: ")
-	#except :
-	#	alias = host
-
-	msg = raw_input("Please input your message: ")
-	#s.send(alias)
-	s.send(msg)
+	sys.exit(chat_client())
