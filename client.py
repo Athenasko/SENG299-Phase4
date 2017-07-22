@@ -18,6 +18,8 @@ from testing import say
 free_cities = ["Detroit" , "Montreal", "Vancouver", "Victoria", "Calgary", "Edmonton", "Quebec City", "Ottawa", "Toronto", "Winnipeg", "Churchill", "Saskatoon", "Regina", "Yellowknife", "Whitehorse", "Dawson City", "Fort Simson", "Iqaluit", "Resolute", "Fredericton", "Saint John", "Halifax", "Dartmouth", "St. Johns", "Grand Falls-Windsor", "Charlottetown", "Summerside"]
 taken_cities = []
 
+test_counter = 1
+
 current_city = "Earth"
 current_alias = "Bob"
 
@@ -51,6 +53,7 @@ whitehorse_path = os.path.join(here, "whitehorse_background.jpg")
 winnipeg_path = os.path.join(here, "winnipeg_background.jpg")
 yellowknife_path = os.path.join(here, "yellowknife_background.jpg")
 background_image = Image(file = image_path)
+
 
 
 def founded_city(): #possibly consider making a function for disabling buttons to reduce code copyingg
@@ -181,6 +184,17 @@ def switch_background():
     pass
  
     #view = ImageTestView(size = window.size)
+def refresh_output(): #going to require this to constantly feed the output from the server to the user
+    global window
+    global test_counter
+    print "Debug"
+    print window.output_field.value
+    window.output_field.value = window.output_field.text + " " + str(test_counter) + "\n" # + latest output 
+    print window.output_field.value
+    remove_window()
+    create_window()
+    test_counter += 1
+    pass
 
 
 join_button = Button(position = (30, 30), 
@@ -210,6 +224,11 @@ send_button = Button(position = (610,690),
     title = "Send Message",
     action = send_message,
     style = 'cancel')
+
+mail_button = Button(position = (600, 90),
+	title = "Check Mailbox",
+	action = refresh_output,
+	style = 'cancel')
 
 join_list_button.enabled = 0
 create_list_button.enabled = 0
@@ -262,11 +281,6 @@ def refresh_buttons():
     value = "Welcome to " + current_city) # have value change with input from other people 
 
     create_window() 
-
-def refresh_output(): #going to require this to constantly feed the output from the server to the user
-    global window
-    window.output_field.text = window.output_field.text # + latest output 
-    pass
 
 class TestWindow(Window):
 
@@ -327,6 +341,7 @@ def create_window():
     window.add(window.output_field)
     window.add(window.room_field)
     window.add(send_button)
+    window.add(mail_button)
     #window.add(window.alias)
     window.show()
 
@@ -342,6 +357,7 @@ def remove_window():
     window.remove(window.output_field)
     window.remove(window.room_field)
     window.remove(send_button)
+    window.remove(mail_button)
 
 window = TestWindow(title = "Chatcity!", 
     bounds = (50, 70, 810, 800),
@@ -375,9 +391,6 @@ window.room_field = TestTextField(3,
 
 create_window()
 
-
-while(1):
-	print ("DEBUG")
 
 application().run()
 
