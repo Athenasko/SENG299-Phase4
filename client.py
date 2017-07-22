@@ -376,4 +376,10 @@ window.room_field = TestTextField(3,
 create_window()
 
 
+while(1):
+	print ("DEBUG")
+
 application().run()
+
+
+
