@@ -15,15 +15,41 @@ from GUI.StdFonts import system_font
 from GUI.StdColors import red,black,yellow,blue 
 from testing import say
 
-free_cities = ["Detorit" , "Montreal", "Vancouver", "Victoria", "Calgary", "Edmonton", "Quebec City", "Ottawa", "Toronto", "Winipeg", "Churchill", "Saskatoon", "Regina", "Yellowknife", "Whitehorse", "Dawson City", "Fort Simson", "Iqaluit", "Resolute", "Fredrickton", "Saint John", "Halifax", "Dartmouth", "St. Johns", "Grand Falls-Windsor", "Charlottetown", "Summerside"]
+free_cities = ["Detroit" , "Montreal", "Vancouver", "Victoria", "Calgary", "Edmonton", "Quebec City", "Ottawa", "Toronto", "Winnipeg", "Churchill", "Saskatoon", "Regina", "Yellowknife", "Whitehorse", "Dawson City", "Fort Simson", "Iqaluit", "Resolute", "Fredericton", "Saint John", "Halifax", "Dartmouth", "St. Johns", "Grand Falls-Windsor", "Charlottetown", "Summerside"]
 taken_cities = []
 
 current_city = "Earth"
 current_alias = "Bob"
 
 here = sys.path[0]
-image_path = os.path.join(here, "city_background.jpg")
+image_path = os.path.join(here, "earth_background.jpg")
 calgary_path = os.path.join(here, "Calgary_background.jpg")
+charlottetown_path = os.path.join(here, "charlottetown_background.jpg")
+churchill_path = os.path.join(here, "churchill_background.jpg")
+dartmouth_path = os.path.join(here, "dartmouth_background.jpg")
+dawson_path = os.path.join(here, "Dawson_city_background.jpg")
+detroit_path = os.path.join(here, "detroit_background.jpg")
+edmonton_path = os.path.join(here, "Edmonton_background.jpg")
+simson_path = os.path.join(here, "Fort_simson_background.jpg")
+fredericton_path = os.path.join(here, "fredericton_background.jpg")
+windsor_path = os.path.join(here, "Grand_falls_windsor_background.jpg")
+halifax_path = os.path.join(here, "Halifax_background.jpg")
+iqaluit_path = os.path.join(here, "iqaluit_background.jpg")
+montreal_path = os.path.join(here, "Montreal_background.jpg")
+ottawa_path = os.path.join(here, "Ottawa_background.jpg")
+quebec_path = os.path.join(here, "quebec_background.jpg")
+regina_path = os.path.join(here, "regina_background.jpg")
+resolute_path = os.path.join(here, "Resolute_background.jpg")
+saint_path = os.path.join(here, "saint_john_background.jpg")
+saskatoon_path = os.path.join(here, "saskatoon_background.jpg")
+john_path = os.path.join(here, "st_john's_background.jpg")
+summerside_path = os.path.join(here, "summerside_background.jpg")
+toronto_path = os.path.join(here, "Toronto_background.jpg")
+vancouver_path = os.path.join(here, "vancouver_background.jpg")
+victoria_path = os.path.join(here, "Victoria_background.jpg")
+whitehorse_path = os.path.join(here, "whitehorse_background.jpg")
+winnipeg_path = os.path.join(here, "winnipeg_background.jpg")
+yellowknife_path = os.path.join(here, "yellowknife_background.jpg")
 background_image = Image(file = image_path)
 
 
@@ -93,8 +119,58 @@ def switch_background():
     print current_city
     if current_city == "Calgary":
        background_image = Image(file = calgary_path)
-    #elif current_city == "":
-    #   background_image = Image(file = _path)
+    elif current_city == "Charlottetown":
+       background_image = Image(file = charlottetown_path)
+    elif current_city == "Churchill":
+       background_image = Image(file = churchill_path)
+    elif current_city == "Dartmouth":
+       background_image = Image(file = dartmouth_path)
+    elif current_city == "Dawson City":
+       background_image = Image(file = dawson_path)
+    elif current_city == "Detroit":
+       background_image = Image(file = detroit_path)
+    elif current_city == "Edmonton":
+       background_image = Image(file = edmonton_path)
+    elif current_city == "Fort Simson":
+       background_image = Image(file = simson_path)
+    elif current_city == "Fredericton":
+       background_image = Image(file = fredericton_path)
+    elif current_city == "Grand Falls-Windsor":
+       background_image = Image(file = windsor_path)
+    elif current_city == "Halifax":
+       background_image = Image(file = halifax_path)
+    elif current_city == "Iqaluit":
+       background_image = Image(file = iqaluit_path)
+    elif current_city == "Montreal":
+       background_image = Image(file = montreal_path)
+    elif current_city == "Ottawa":
+       background_image = Image(file = ottawa_path)
+    elif current_city == "Quebec City":
+       background_image = Image(file = quebec_path)
+    elif current_city == "Regina":
+       background_image = Image(file = regina_path)
+    elif current_city == "Resolute":
+       background_image = Image(file = resolute_path)
+    elif current_city == "Saint John":
+       background_image = Image(file = saint_path)
+    elif current_city == "Saskatoon":
+       background_image = Image(file = saskatoon_path)
+    elif current_city == "St. Johns":
+       background_image = Image(file = john_path)
+    elif current_city == "Summerside":
+       background_image = Image(file = summerside_path)
+    elif current_city == "Toronto":
+       background_image = Image(file = toronto_path)
+    elif current_city == "Vancouver":
+       background_image = Image(file = vancouver_path)
+    elif current_city == "Victoria":
+       background_image = Image(file = victoria_path)
+    elif current_city == "Whitehorse":
+       background_image = Image(file = whitehorse_path)
+    elif current_city == "Winnipeg":
+       background_image = Image(file = winnipeg_path)
+    elif current_city == "Yellowknife":
+       background_image = Image(file = yellowknife_path)
     else:
         background_image = Image(file = image_path)
     view = ImageTestView(size = window.size)
@@ -227,7 +303,7 @@ class ImageTestView(View):
         c.backcolor = blue
         c.erase_rect(r)
         main_image_pos = (20, 10)
-        src_rect = rect_sized((10,10), (4000,4000))
+        src_rect = rect_sized((10,10), (700,260))
         #src_rect = rect_sized((180, 160), (100, 100))
         dst_rect = offset_rect(src_rect, main_image_pos)
         #dst_rect = rect_sized((10, 340), (150, 150))
