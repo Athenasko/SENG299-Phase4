@@ -16,7 +16,7 @@ from GUI.Geometry import offset_rect, rect_sized
 from GUI.StdFonts import system_font
 from GUI.StdColors import red,black,yellow,blue 
 from testing import say
-
+free_cities
 
 class guiThread (threading.Thread):
    def __init__(self, threadID, name, counter):
@@ -88,7 +88,7 @@ def chat_client(host,port):
 
 
 def clientgui():
-
+	global free_cities
 	free_cities = ["Detroit" , "Montreal", "Vancouver", "Victoria", "Calgary", "Edmonton", "Quebec City", "Ottawa", "Toronto", "Winnipeg", "Churchill", "Saskatoon", "Regina", "Yellowknife", "Whitehorse", "Dawson City", "Fort Simson", "Iqaluit", "Resolute", "Fredericton", "Saint John", "Halifax", "Dartmouth", "St. Johns", "Grand Falls-Windsor", "Charlottetown", "Summerside"]
 	taken_cities = []
 
@@ -471,11 +471,11 @@ def clientgui():
 #clientgui()
 
 thread1 = clientThread(1, "Thread-1", 1)
-thread2 = clientThread(2, "Thread-2", 2)
+#thread2 = clientThread(2, "Thread-2", 2)
 
 thread1.start()
-thread2.start()
+#thread2.start()
 
-#clientgui()
+clientgui()
 
 print "Exiting main thread"

@@ -14,6 +14,7 @@ def server():
 
 	#makes socket reusable 
 	server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)				
+	server_socket.setblocking(0)
 	server_socket.bind((host, port))
 
  	#for 20 client connection
@@ -77,10 +78,10 @@ def broadcast(server_socket, sock, message):
 		
 	for socket in socket_list: 
 		#so it doesn't send to sender
-		if socket != server_socket and socket != sock :
-			try :
+		if socket != server_socket and socket != sock:
+			try:
 				socket.send(message)
-			except :
+			except:
 				#broken connection
 				socket.close()
 				#if socket is broken remove it
