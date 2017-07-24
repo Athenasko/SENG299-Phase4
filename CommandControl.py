@@ -67,9 +67,9 @@ class City:
 		self.name = name
 
 	def broadcast(self, user, message):
-		message = "[" + user.aslias + "]: " + message
-			for user in self.user_list:
-				user.socket.sendall(message)
+		message = "[" + user.alias + "]: " + message
+		for user in self.user_list:
+			user.socket.sendall(message)
 
 class User:
 	def __init__(self, socket, alias = "Anonymous"):

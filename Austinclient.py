@@ -49,6 +49,19 @@ def chat_client():
 				server_socket.send(message_data)
 				sys.stdout.write('[Me] '); sys.stdout.flush() 
 
+def Broadcast(server_socket, city, message):
+	message = "[" + user.alias + "]: " + message
+
+class City:
+	def __init__(self, name):
+		self.user_list = []
+		self.name = name
+
+class User:
+	def __init__(self, socket, name = "Anonymous"):
+		socket.setblocking(0)
+		self.alias = name
+
 if __name__ == "__main__":
 
 	sys.exit(chat_client())
