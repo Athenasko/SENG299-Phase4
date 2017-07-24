@@ -24,15 +24,19 @@ class Earth:
 		self.world_map = {}
 
 	def list_rooms(self, user):
+		city_list = "Current cities:\n"
+		for city in self.cities
+			city_list += city + "| Population: " + len(self.cities[city].users)
+		user.socket.sendall(cities)
 
 	def create_room(self, user, room):
 
 	def delete_room(self, user, room):
 
-	def list_users(self, user):
+	def list_users(self, user, room):
 
-	def change_alias(self, user, alias):
-		user.alias = alias
+	def change_alias(self, user, new_alias):
+		user.alias = new_alias
 
 	def block_user(self, user, bl_user):
 
