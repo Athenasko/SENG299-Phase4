@@ -24,7 +24,19 @@ supertestcounter = 1
 
 #THREAD CLASSES FOR ATTEMPT TO MULTITHREAD - DOES NOT WORK DUE TO PYTHON GIL
 
-class guiThread (threading.Thread):
+#class guiThread (threading.Thread): #Just going to run the GUI in the main thread
+#   def __init__(self, threadID, name, counter):
+#      threading.Thread.__init__(self)
+#      self.threadID = threadID
+#      self.name = name
+#      self.counter = counter
+#   def run(self):
+#      print "Starting " + self.name
+#      clientgui()
+#      print "Exiting " + self.name
+
+
+class clientThread (threading.Thread):
    def __init__(self, threadID, name, counter):
       threading.Thread.__init__(self)
       self.threadID = threadID
@@ -32,101 +44,89 @@ class guiThread (threading.Thread):
       self.counter = counter
    def run(self):
       print "Starting " + self.name
-      clientgui()
+      chat_client("localhost",6969)
       print "Exiting " + self.name
 
-
-class clientThread (threading.Thread):
-	def __init__(self, threadID, name, counter):
-		threading.Thread.__init__(self)
-		self.threadID = threadID
-		self.name = name
-		self.counter = counter
-	def run(self):
-		print "Starting " + self.name
-		chat_client("localhost",6969)
-		print "Exiting " + self.name
-
 class dummyThread (threading.Thread):
-	def __init__(self, threadID, name, counter):
-		threading.Thread.__init__(self)
-		self.threadID = threadID
-		self.name = name
-		self.counter = counter
-	def run(self):
-		print "Starting " + self.name
-		dummyfunction()
-		print "Exiting " + self.name
+   def __init__(self, threadID, name, counter):
+      threading.Thread.__init__(self)
+      self.threadID = threadID
+      self.name = name
+      self.counter = counter
+   def run(self):
+      print "Starting " + self.name
+      dummyfunction()
+      print "Exiting " + self.name
 
 def dummyfunction():
-	global supertestcounter
-	while(1):
-		supertestcounter += 1
-		if supertestcounter >= 2000000:
-			break
-	supertestcounter = "OOOOOH YEAH I'M MR MEESEEKS LOOK AT ME"
+   global supertestcounter
+   while(1):
+      supertestcounter += 1
+      if supertestcounter >= 2000000:
+         break
+   supertestcounter = "OOOOOH YEAH I'M MR MEESEEKS LOOK AT ME"
 
 #CHAT CLIENT FOR BOGO TO BOGO CONNECTION TO SERVER
 
 def chat_client(host,port):
-	#testlock2.acquire()
-	global testlock
-	global threadtest
-	global supertestcounter
-	#if(len(sys.argv) < 3):
-	#	print 'Usage : python chat_client.py hostname port'
-	#	sys.exit()
+   #testlock2.acquire()
+   global testlock
+   global threadtest
+   global supertestcounter
+   #if(len(sys.argv) < 3):
+   #  print 'Usage : python chat_client.py hostname port'
+   #  sys.exit()
 
-	#host = sys.argv[1]
-	#port = int(sys.argv[2])
+   #host = sys.argv[1]
+   #port = int(sys.argv[2])
      
-	server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	server_socket.settimeout(2)
+   server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+   server_socket.settimeout(2)
      
-	#connect to remote host
-	try:
-		server_socket.connect((host, port))
-	except:
-		print 'Unable to connect'
-		sys.exit()
+   #connect to remote host
+   try:
+      server_socket.connect((host, port))
+   except:
+      print 'Unable to connect'
+      sys.exit()
      
-	print 'Connected to remote host. You can start sending messages'
-	sys.stdout.write('[Me] '); sys.stdout.flush()
-	print "Lose control of the interperator right about"
-	
-	socket_list = [sys.stdin, server_socket] # replace with code from binary tides
-	
+   print 'Connected to remote host. You can start sending messages'
+   sys.stdout.write('[Me] '); sys.stdout.flush()
+   print "Lose control of the interperator right about"
+   
+   socket_list = [sys.stdin, server_socket] # replace with code from binary tides
+   
 
-	while 1:
-		#socket_list = [sys.stdin, server_socket]
-		socket_list = [server_socket]
-		supertestcounter += 1
+   while 1:
+      #socket_list = [sys.stdin, server_socket]
+      socket_list = [server_socket]
+      supertestcounter += 1
 
-		#Get the list sockets which are readable
-		ready_for_reading, ready_for_writing, error_condition = select.select(socket_list , [], [])
+      #Get the list sockets which are readable
+      ready_for_reading, ready_for_writing, error_condition = select.select(socket_list , [], [])
          
-		for sock in ready_for_reading:  
-			threadtest = 0           
-			if sock == server_socket:
-				#incoming message from remote server, server_socket
-				data = sock.recv(4096)
-				if not data:
-					#print '\nDisconnected from chat server'
-					sys.exit()
-				else:
-					pass
-					#print data
-					#sys.stdout.write(data) #THIS NEEDS TO BE WHERE WE INCORPORATE THE TRANSFERING OF THE DATA FROM THE SERVER TO THE MESSAGE BOX
-					#sys.stdout.write('[Me] '); sys.stdout.flush()     
+      for sock in ready_for_reading:  
+         threadtest = 0           
+         if sock == server_socket:
+            #incoming message from remote server, server_socket
+            data = sock.recv(4096)
+            if not data:
+               #print '\nDisconnected from chat server'
+               sys.exit()
+            else:
+               pass
+               #print data
+               #sys.stdout.write(data) #THIS NEEDS TO BE WHERE WE INCORPORATE THE TRANSFERING OF THE DATA FROM THE SERVER TO THE MESSAGE BOX
+               #sys.stdout.write('[Me] '); sys.stdout.flush()     
             
-			else:
+         else:
 
-				#user entered a message
-				#message_data = sys.stdin.readline() # THIS IS WERE WE NEED TO INCORPPORATE THE TRANSFERING OF THE DATA FROM THE TEXT SEND TO BE SENT TO THE SERVER
-				server_socket.send(message_data)
-				#sys.stdout.write('[Me] '); sys.stdout.flush() 
-
-		threadtest = 0
+            #user entered a message
+            #message_data = sys.stdin.readline() # THIS IS WERE WE NEED TO INCORPPORATE THE TRANSFERING OF THE DATA FROM THE TEXT SEND TO BE SENT TO THE SERVER
+            #server_socket.send(message_data)
+            #sys.stdout.write('[Me] '); sys.stdout.flush() 
+            pass
+      threadtest = 0
 
 
 #GUI CODE USING PYGUI
@@ -243,16 +243,16 @@ def send_message(): #need to implement
    # print window.input_field
 
 def change_alias(): #need to implement 
-	global current_alias
-	global Alias_MAX
-	if len(window.alias.text) > Alias_MAX:
-		print("Name too long")
-		pass #needs to pop up dialog telling them it wont work
-	else:
-		current_alias = window.alias.text 
-	remove_window()
-	refresh_buttons()
-	pass
+   global current_alias
+   global Alias_MAX
+   if len(window.alias.text) > Alias_MAX:
+      print("Name too long")
+      pass #needs to pop up dialog telling them it wont work
+   else:
+      current_alias = window.alias.text 
+   remove_window()
+   refresh_buttons()
+   pass
 
 #Code to check city tags and change the pathing for the background image
 def switch_background():
@@ -319,16 +319,16 @@ def switch_background():
     view = ImageView(size = window.size)
  
 #def test(): #Testing the sending of shared data between the threads - this is where we discovered the Python GIL killed the system
-# 	global threadtest
-# 	global testlock
-#	global supertestcounter
- 	#testlock.acquire()
- 	#if threadtest != 0:
- 	#	threadtest = 1
- 	#testlock.release()
-# 	print supertestcounter
-# 	if threadtest == 0:
-# 		print "DEBUG HELLO"
+#  global threadtest
+#  global testlock
+#  global supertestcounter
+   #testlock.acquire()
+   #if threadtest != 0:
+   #  threadtest = 1
+   #testlock.release()
+#  print supertestcounter
+#  if threadtest == 0:
+#     print "DEBUG HELLO"
 
     #view = ImageView(size = window.size)
 
@@ -376,15 +376,15 @@ send_button = Button(position = (610,690),
     style = 'cancel')
 
 alias_button = Button(position = (600, join_button.bottom + 30),
-	title = "Change alias",
-	action = change_alias,
-	style = 'cancel')
+   title = "Change alias",
+   action = change_alias,
+   style = 'cancel')
 
 
 #mail_button = Button(position = (600, 90),
-#	title = "Check Mailbox",
-#	action = test,
-#	style = 'cancel')
+#  title = "Check Mailbox",
+#  action = test,
+#  style = 'cancel')
 
 join_list_button.enabled = 0
 #create_list_button.enabled = 0
@@ -425,35 +425,35 @@ leave_button.enabled = 0
 
 def refresh_buttons():
 
-	window.alias = TestTextField(5, #consider condensing this with the alias textfield, and add phrase such as alias currently resides in city
-    position = (405, join_button.bottom + 30),
-    width = 200,
-    value = current_alias)
+   window.alias = TestTextField(5, #consider condensing this with the alias textfield, and add phrase such as alias currently resides in city
+      position = (405, join_button.bottom + 30),
+      width = 200,
+      value = current_alias)
 
-	window.input_alias = TestTextField(6, #consider condensing this with the alias textfield, and add phrase such as alias currently resides in city
-    position = (30, 690),
-    width = (len(current_alias) + 2) * 9,
-    editable = False,
-    value = current_alias + ":")
+   window.input_alias = TestTextField(6, #consider condensing this with the alias textfield, and add phrase such as alias currently resides in city
+      position = (30, 690),
+      width = (len(current_alias) + 2) * 9,
+      editable = False,
+      value = current_alias + ":")
 
-	window.input_field = TestTextField(1, #input
-    position = (window.input_alias.right - 5, 690),
-    width = 580-(len(current_alias)+2)*8)
+   window.input_field = TestTextField(1, #input
+      position = (window.input_alias.right - 5, 690),
+      width = 580-(len(current_alias)+2)*8)
 
-	window.room_field = TestTextField(3,
-    position = (30, 260),
-    width = 300,
-    editable = False,
-    value = current_alias + " currently resides in " + current_city)
+   window.room_field = TestTextField(3,
+      position = (30, 260),
+      width = 300,
+      editable = False,
+      value = current_alias + " currently resides in " + current_city)
 
-	window.output_field = TestTextField(2, #output
-    position = (30, 290),
-    width = 700,
-    height = 400,
-    editable = False,
-    value = "Welcome to " + current_city) # have value change with input from other people 
+   window.output_field = TestTextField(2, #output
+      position = (30, 290),
+      width = 700,
+      height = 400,
+      editable = False,
+      value = "Welcome to " + current_city) # have value change with input from other people 
 
-	create_window() 
+   create_window() 
 
 class TestTextField(TextField):
 
@@ -558,12 +558,13 @@ window.alias = TestTextField(5, #consider condensing this with the alias textfie
 
 
 #clientgui()
+with nogil:
+   
+#thread1 = clientThread(1, "Thread-1", 1)
+   thread2 = dummyThread(2, "Thread-2", 2)
 
-thread1 = clientThread(1, "Thread-1", 1)
-#thread2 = dummyThread(2, "Thread-2", 2)
-
-thread1.start()
-#thread2.start()
+#thread1.start()
+   thread2.start()
 
 create_window()
 
