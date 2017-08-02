@@ -7,10 +7,12 @@
 #s.connect(address)
 #s.send(msg)
 
+import re
 import socket
 import os, sys
 import threading
 import select
+import time
 from GUI import Window, Button, Font, ListButton, application, TextField, View, Image
 from GUI.Geometry import offset_rect, rect_sized
 from GUI.StdFonts import system_font
@@ -22,11 +24,14 @@ testlock2 = threading.Lock()
 threadtest = 2
 supertestcounter = 1
 sending = 0
-recieved = ""
-MAX_SEND_LEN = 200
-MAX_LINE = 20
+received = ""
+MAX_SEND_LEN = 69
+MAX_LINE = 22
 line_counter = 0
+received_city = ""
+received_alias = ""
 
+#datapattern = re.complie( )# pattern for seperating the data string into key parts 
 
 #THREAD CLASSES FOR ATTEMPT TO MULTITHREAD - DOES NOT WORK DUE TO PYTHON GIL
 
@@ -81,7 +86,9 @@ def chat_client(host,port):
   global supertestcounter
   global sending
   global window
-  global recieved
+  global received
+  global received_city
+  global received_alias
   #if(len(sys.argv) < 3):
   # print 'Usage : python chat_client.py hostname port'
   # sys.exit()
@@ -124,8 +131,15 @@ def chat_client(host,port):
           sys.exit()
         else:
           #call function on the main thread that fixes things
-          recieved = data
-          refresh_output_recieve()
+          tempdata = data
+          received = re.findall('\((.*?)\)',tempdata) 
+          tempdata = data
+          received_city = re.findall('\{(.*?)\}',tempdata)
+          tempdata = data
+          received_alias = re.findall('\[(.*?)\]',tempdata)
+          
+
+          refresh_output_receive()
           pass
           #print data
           #sys.stdout.write(data) #THIS NEEDS TO BE WHERE WE INCORPORATE THE TRANSFERING OF THE DATA FROM THE SERVER TO THE MESSAGE BOX
@@ -141,11 +155,12 @@ def chat_client(host,port):
     if sending == 1:
 
       #user entered a message
-      message_data = '[' + current_alias + '] ' + window.input_field.text + '\n'
+      message_data = '{' + current_city + '}' +  '[' + current_alias + ']' + '(' + window.input_field.text + ')' #+ '\n'
       #message_data = [current_alias, current_city,window.input_field.text]
       #message_data.append
       #sys.stdin.readline() # THIS IS WERE WE NEED TO INCORPPORATE THE TRANSFERING OF THE DATA FROM THE TEXT SEND TO BE SENT TO THE SERVER
       server_socket.send(message_data)
+      refresh_output_send()
 
       #window.output_field.value = window.output_field.text + '[' + current_alias + '] ' +  window.input_field.text + '\n' # ACTUALLY WORKING Dummy CODE
       #window.output_field.value = window.output_field.text + " " + str(test_counter) + "\n" # + latest output #DEBUG CODE
@@ -167,7 +182,7 @@ def chat_client(host,port):
 free_cities = ["Detroit" , "Montreal", "Vancouver", "Victoria", "Calgary", "Edmonton", "Quebec City", "Ottawa", "Toronto", "Winnipeg", "Churchill", "Saskatoon", "Regina", "Yellowknife", "Whitehorse", "Dawson City", "Fort Simson", "Iqaluit", "Resolute", "Fredericton", "Saint John", "Halifax", "Dartmouth", "St. Johns", "Grand Falls-Windsor", "Charlottetown", "Summerside"]
 #taken_cities = [] #REMOVED CREATION OF CHATROOM FUNCTIONALITY DUE TO COMPLICATIONS WITH UPDATING LISTS ON ALL CLIENTS
 
-Alias_MAX = 13 #Need to test and fix values
+Alias_MAX = 10 #Need to test and fix values
 Message_MAX = 200 #aswell 
 
 test_counter = 1
@@ -175,7 +190,7 @@ test_counter = 1
 current_city = "Earth"
 
 #Need to implement a better default alias and system for changing it - going to attempt to use dialog boxes
-current_alias = "Default BOB" 
+current_alias = "Anonymus" 
 
 
 #ALL THE PATHING FOR SWITCHING THE BACKGROUND FOR EACH CHAT ROOM
@@ -237,12 +252,14 @@ def joined_city(): #Joining chatrooms
     global free_cities
     global taken_cities
     global current_city
+    global line_counter
     current_city = free_cities[join_list_button.value]
     #print "Moved to the city of", current_city
     switch_background()
     remove_window()
     refresh_buttons()
     join_list_button.enabled = 0
+    line_counter = 0
 #    create_list_button.enabled = 0
     join_button.enabled = 0
 #    create_button.enabled = 0
@@ -258,11 +275,13 @@ def occupied_city_list(): # enables the list button for changing rooms
 
 def leave_city(): #leaving chatrooms for the default main room
     global current_city
+    global line_counter
     current_city = "Earth"
     switch_background()
     remove_window()
     refresh_buttons()
     join_button.enabled = 1
+    line_counter = 0
 #    create_button.enabled = 1
     join_list_button.enabled = 0
 #    create_list_button.enabled = 0
@@ -270,11 +289,21 @@ def leave_city(): #leaving chatrooms for the default main room
    
 def send_message(): #need to implement 
     global sending
+    global MAX_SEND_LEN
+    global line_counter
+    global MAX_LINE
     #global window
     #window.output_field.value = window.output_field_text + window.input_field.text + '/n'
     #remove_window()
-    sending = 1
-    refresh_output_send()
+    
+    if len(window.input_field.text) > MAX_SEND_LEN:
+      print("Message too long")
+    elif line_counter > MAX_LINE:
+      pass
+    else:
+      sending = 1
+      #refresh_output_send()
+      
     #print "Debug " 
    # print window.input_field.text
    # print window.input_field
@@ -360,36 +389,64 @@ def test(): #Testing the sending of shared data between the threads - this is wh
   global threadtest
   global testlock
   global supertestcounter
+  global received_alias
+  global received_city
+  global received
   #testlock.acquire()
   #if threadtest != 0:
   # threadtest = 1
   #testlock.release()
   print supertestcounter
+  print received_alias
+  print received_city
+  print received
 #   if threadtest == 0:
 #     print "DEBUG HELLO"
 
     #view = ImageView(size = window.size)
 
 def refresh_output_receive():
-    global recieved
+    global received
     global window
     global test_counter
-    #This would be where I would implement the filtering of the recieved text before refreshing the output 
-    window.output_field.value = window.output_field.text + recieved
-    remove_window()
-    create_window()
+    global MAX_LINE
+    global line_counter
+    global received_city
+    global received_alias
+    #This would be where I would implement the filtering of the received text before refreshing the output 
+    line_counter += 1
+    print line_counter
+    if line_counter >= MAX_LINE:
+      print "Too many lines" #This is where we'd have to figure out how to remove the lines
+    else:
+      if len(received_city)<=0:
+        pass
+      else:
+        if received_city[0] == current_city or received_city[0] == "Earth":
+          window.output_field.value = window.output_field.text + '[' + received_alias[0] + '] ' + received[0] + '\n'
+          remove_window()
+          create_window()
+        else:
+          pass
 
 #Would call refresh_output_send everytime the 
 def refresh_output_send(): #going to require this to constantly feed the output from the server to the user
-    global recieved
+    global received
     global window
     global test_counter
+    global MAX_LINE
+    global line_counter
    # print "Debug"
     #print window.output_field.value
-    print "DEBUG"
-    #window.output_field.value = window.output_field.text + recieved
-    window.output_field.value = window.output_field.text + '[' + current_alias + '] ' +  window.input_field.text + '\n'
-    window.input_field.value = ""
+    #print "DEBUG"
+    #window.output_field.value = window.output_field.text + received
+    line_counter += 1
+    print line_counter
+    if line_counter >= MAX_LINE:
+      print "Too many lines" # - same thing as the recieving
+    else:
+      window.output_field.value = window.output_field.text + '[' + current_alias + '] ' +  window.input_field.text + '\n'
+      #window.input_field.value = ""
     #window.output_field.value = window.output_field.text + " " + str(test_counter) + "\n" # + latest output #DEBUG CODE
     #print window.output_field.value
     remove_window()
