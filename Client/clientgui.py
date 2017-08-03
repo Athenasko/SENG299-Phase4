@@ -86,9 +86,9 @@ class clientThread (threading.Thread): #Thread for running client - server commu
     self.counter = counter
   def run(self):
     global host
-    print "Starting " + self.name
+    #print "Starting " + self.name
     chat_client(host,6969)
-    print "Exiting " + self.name
+    #print "Exiting " + self.name
 
 
 #CHAT CLIENT FOR BOGO TO BOGO CONNECTION TO SERVER
