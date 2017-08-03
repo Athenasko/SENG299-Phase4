@@ -13,10 +13,10 @@ from GUI.StdFonts import system_font
 from GUI.StdColors import red,black,yellow,blue 
 from testing import say
 
-#if(len(sys.argv) < 3): #MIGHT STILL WANT ALL OF THIS
-# print 'Usage : python chat_client.py hostname port'
-# sys.exit()
-#host = sys.argv[1] #MIGHT STILL WANT TO IMPLEMENT THIS FOR SYSTEM 
+if(len(sys.argv) < 2): #MIGHT STILL WANT ALL OF THIS
+  print 'Usage : python chat_client.py hostname'
+  sys.exit()
+host = sys.argv[1] #MIGHT STILL WANT TO IMPLEMENT THIS FOR SYSTEM 
 #port = int(sys.argv[2])
 
 #ALL THE GLOBAL STUFF
@@ -31,13 +31,14 @@ received_city = ""
 received_alias = ""
 message_queue = Queue.Queue()
 temp_message_queue = Queue.Queue()
+current_error = ""
 
 #list of all the different chat rooms - 2 of each city per province + Detroit
 free_cities = ["Detroit" , "Montreal", "Vancouver", "Victoria", "Calgary", "Edmonton", "Quebec City", "Ottawa", "Toronto", "Winnipeg", "Churchill", "Saskatoon", "Regina", "Yellowknife", "Whitehorse", "Dawson City", "Fort Simson", "Iqaluit", "Resolute", "Fredericton", "Saint John", "Halifax", "Dartmouth", "St. Johns", "Grand Falls-Windsor", "Charlottetown", "Summerside"]
 Alias_MAX = 10 #
 test_counter = 1
 current_city = "Earth" #Default chatroom for the system, also acts as global message sender
-current_alias = "Anonymus" #Default alias for the alias system
+current_alias = "Anonymous" #Default alias for the alias system
 
 #ALL THE PATHING FOR SWITCHING THE BACKGROUND FOR EACH CHAT ROOM
 here = sys.path[0]
@@ -82,8 +83,9 @@ class clientThread (threading.Thread): #Thread for running client - server commu
     self.name = name
     self.counter = counter
   def run(self):
+    global host
     print "Starting " + self.name
-    chat_client("localhost",6969)
+    chat_client(host,6969)
     print "Exiting " + self.name
 
 
@@ -92,7 +94,6 @@ class clientThread (threading.Thread): #Thread for running client - server commu
 #CHAT CLIENT FOR BOGO TO BOGO CONNECTION TO SERVER
 
 def chat_client(host,port):
-  #testlock2.acquire()
   global testlock
   global threadtest
   global supertestcounter
@@ -164,7 +165,9 @@ def joined_city(): #Joining chatrooms
     global taken_cities
     global current_city
     global line_counter
+    global current_error
     current_city = free_cities[join_list_button.value]
+    current_error = "" 
     switch_background()
     remove_window()
     refresh_buttons()
@@ -179,7 +182,10 @@ def occupied_city_list(): # enables the list button for changing rooms
 def leave_city(): #leaving chatrooms for the default main room
     global current_city
     global line_counter
+    global current_error
+
     current_city = "Earth"
+    current_error = ""
     switch_background()
     remove_window()
     refresh_buttons()
@@ -195,26 +201,33 @@ def send_message(): #need to implement
     global MAX_SEND_LEN
     global line_counter
     global MAX_LINE
+    global current_error
     #global window
     #window.output_field.value = window.output_field_text + window.input_field.text + '/n'
     #remove_window()
     
     if len(window.input_field.text) > MAX_SEND_LEN:
-      print("Message too long") #will want to move to error dialog box 
+        current_error = ("ERROR: Message too long")
+        remove_window()
+        refresh_buttonsv2()
+        current_error = ""
     elif line_counter > MAX_LINE:
       pass
     else:
+      current_error = ""
       sending = 1
-      #refresh_output_send()
 
 def change_alias(): #need to implement 
   global current_alias
   global Alias_MAX
+  global current_error
   if len(window.alias.text) > Alias_MAX:
-    print("Name too long")
-    pass #needs to pop up dialog telling them it wont work
+    current_error = ("ERROR: Name too long")
+    remove_window
+    refresh_buttonsv2()
   else:
     current_alias = window.alias.text 
+    current_error = ""
   remove_window()
   #refresh_buttons()
   refresh_buttonsv2()
@@ -283,17 +296,17 @@ def switch_background():
         background_image = Image(file = image_path)
     view = ImageView(size = window.size)
  
-def test(): #Testing the sending of shared data between the threads - this is where we discovered the Python GIL killed the system
-  global threadtest
-  global testlock
-  global supertestcounter
-  global received_alias
-  global received_city
-  global received
-  print supertestcounter
-  print received_alias
-  print received_city
-  print received
+#def test(): #Testing the sending of shared data between the threads - this is where we discovered the Python GIL killed the system
+#  global threadtest
+#  global testlock
+#  global supertestcounter
+#  global received_alias
+#  global received_city
+#  global received
+#  print supertestcounter
+#  print received_alias
+#  print received_city
+#  print received
 
 def queue_refresh(message):
   global message_queue
@@ -306,7 +319,6 @@ def queue_refresh(message):
   while not message_queue.empty():
     pop = message_queue.get()
     temp_message_queue.put(pop)
-    print "DEBUG"
     window.output_field.value = window.output_field.text + pop + '\n'
   while not temp_message_queue.empty():
     message_queue.put(temp_message_queue.get())
@@ -330,10 +342,10 @@ def refresh_output_receive():
         if received_city[0] == current_city or received_city[0] == "Earth":
           temp_message = '[' + received_alias[0] + '] ' + received[0]
           line_counter += 1
-          print line_counter
+          #print line_counter
           if line_counter >= MAX_LINE:
             queue_refresh(temp_message)
-            print "Too many lines" #This is where we'd have to figure out how to remove the lines
+            #print "Too many lines"
           else: 
             message_queue.put(temp_message)
             window.output_field.value = window.output_field.text + temp_message + '\n'
@@ -353,11 +365,12 @@ def refresh_output_send():
     print line_counter
     if line_counter >= MAX_LINE:
       queue_refresh(temp_sending)
-      print "Too many lines" # - same thing as the recieving
+      #print "Too many lines" 
     else:
       message_queue.put(temp_sending)
       window.output_field.value = window.output_field.text + temp_sending + '\n'
     remove_window()
+    refresh_buttonsv2()
     create_window()
 
 
@@ -388,10 +401,10 @@ alias_button = Button(position = (600, join_button.bottom + 30),
   style = 'cancel')
 
 
-mail_button = Button(position = (600, alias_button.bottom + 30),
- title = "Check Mailbox",
- action = test,
- style = 'cancel')
+#test_button = Button(position = (600, alias_button.bottom + 30),
+# title = "Check Mailbox",
+# action = test,
+# style = 'cancel')
 
 join_list_button.enabled = 0
 leave_button.enabled = 0
@@ -418,7 +431,7 @@ def refresh_buttons():
 
   window.room_field = TestTextField(3,
     position = (30, 260),
-    width = 300,
+    width = 400,
     editable = False,
     value = current_alias + " currently resides in " + current_city)
 
@@ -429,9 +442,17 @@ def refresh_buttons():
     editable = False,
     value = "Welcome to " + current_city + "\n") # have value change with input from other people 
 
+  window.error_message = TestTextField(7,
+    position = (window.room_field.right, 260),
+    width = 300,
+    editable = False,
+    value = current_error)
+
   create_window() 
 
-def refresh_buttonsv2():
+def refresh_buttonsv2(): #Doesn't refresh the output field
+
+  global current_error
 
   window.alias = TestTextField(5, #consider condensing this with the alias textfield, and add phrase such as alias currently resides in city
     position = (405, join_button.bottom + 30),
@@ -450,12 +471,17 @@ def refresh_buttonsv2():
 
   window.room_field = TestTextField(3,
     position = (30, 260),
-    width = 300,
+    width = 400,
     editable = False,
     value = current_alias + " currently resides in " + current_city)
 
-  create_window() 
+  window.error_message = TestTextField(7,
+    position = (window.room_field.right, 260),
+    width = 300,
+    editable = False,
+    value = current_error)
 
+  create_window() 
 # WINDOW VIEWS AND REFRESH FUNCTIONS
 
 class TestTextField(TextField):
@@ -483,7 +509,8 @@ def create_window(): #USED to create and later readd buttons and views to the wi
     window.add(window.output_field)
     window.add(window.room_field)
     window.add(send_button)
-    window.add(mail_button)
+    #window.add(mail_button)
+    window.add(window.error_message)
     window.add(window.alias)
     window.add(window.alias_title)
     window.add(alias_button)
@@ -503,7 +530,8 @@ def remove_window(): #Used to remove all the buttons and views for refresh
     window.remove(alias_button)
     window.remove(window.alias_title)
     window.remove(window.input_alias)
-    window.remove(mail_button)
+    window.remove(window.error_message)
+    #window.remove(mail_button)
     window.remove(window.alias)
 
 
@@ -516,7 +544,7 @@ window = Window(title = "Chatcity!",
 
 view = ImageView(size = window.size)
 
-print len(current_alias)
+#print len(current_alias)
 
 window.input_alias = TestTextField(6, #consider condensing this with the alias textfield, and add phrase such as alias currently resides in city
     position = (30, 690),
@@ -537,7 +565,7 @@ window.output_field = TestTextField(2, #output
 
 window.room_field = TestTextField(3,
     position = (30, 260),
-    width = 300,
+    width = 400,
     editable = False,
     value = current_alias + " currently resides in " + current_city) 
 
@@ -551,6 +579,12 @@ window.alias = TestTextField(5, #consider condensing this with the alias textfie
     position = (405, join_button.bottom + 30),
     width = 200,
     value = current_alias)
+
+window.error_message = TestTextField(7,
+    position = (window.room_field.right, 260),
+    width = 300,
+    editable = False,
+    value = current_error)
 
 
 
