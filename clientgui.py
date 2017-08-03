@@ -1,11 +1,4 @@
-#copied Socket Client segement 
-#s = socket.socket()
-#host = socket.gethostname()
-#port = 9999
-#address = (host, port)
-#msg = 'test 123'
-#s.connect(address)
-#s.send(msg)
+#PUT DOCCUMENTATION HERE 
 
 import re
 import socket
@@ -13,11 +6,20 @@ import os, sys
 import threading
 import select
 import time
+import Queue
 from GUI import Window, Button, Font, ListButton, application, TextField, View, Image
 from GUI.Geometry import offset_rect, rect_sized
 from GUI.StdFonts import system_font
 from GUI.StdColors import red,black,yellow,blue 
 from testing import say
+
+#if(len(sys.argv) < 3): #MIGHT STILL WANT ALL OF THIS
+# print 'Usage : python chat_client.py hostname port'
+# sys.exit()
+#host = sys.argv[1] #MIGHT STILL WANT TO IMPLEMENT THIS FOR SYSTEM 
+#port = int(sys.argv[2])
+
+#ALL THE GLOBAL STUFF
 
 supertestcounter = 1
 sending = 0
@@ -27,6 +29,51 @@ MAX_LINE = 22
 line_counter = 0
 received_city = ""
 received_alias = ""
+message_queue = Queue.Queue()
+temp_message_queue = Queue.Queue()
+
+#list of all the different chat rooms - 2 of each city per province + Detroit
+free_cities = ["Detroit" , "Montreal", "Vancouver", "Victoria", "Calgary", "Edmonton", "Quebec City", "Ottawa", "Toronto", "Winnipeg", "Churchill", "Saskatoon", "Regina", "Yellowknife", "Whitehorse", "Dawson City", "Fort Simson", "Iqaluit", "Resolute", "Fredericton", "Saint John", "Halifax", "Dartmouth", "St. Johns", "Grand Falls-Windsor", "Charlottetown", "Summerside"]
+Alias_MAX = 10 #
+test_counter = 1
+current_city = "Earth" #Default chatroom for the system, also acts as global message sender
+current_alias = "Anonymus" #Default alias for the alias system
+
+#ALL THE PATHING FOR SWITCHING THE BACKGROUND FOR EACH CHAT ROOM
+here = sys.path[0]
+image_path = os.path.join(here, "earth_background.jpg")
+calgary_path = os.path.join(here, "Calgary_background.jpg")
+charlottetown_path = os.path.join(here, "charlottetown_background.jpg")
+churchill_path = os.path.join(here, "churchill_background.jpg")
+dartmouth_path = os.path.join(here, "dartmouth_background.jpg")
+dawson_path = os.path.join(here, "Dawson_city_background.jpg")
+detroit_path = os.path.join(here, "detroit_background.jpg")
+edmonton_path = os.path.join(here, "Edmonton_background.jpg")
+simson_path = os.path.join(here, "Fort_simson_background.jpg")
+fredericton_path = os.path.join(here, "fredericton_background.jpg")
+windsor_path = os.path.join(here, "Grand_falls_windsor_background.jpg")
+halifax_path = os.path.join(here, "Halifax_background.jpg")
+iqaluit_path = os.path.join(here, "iqaluit_background.jpg")
+montreal_path = os.path.join(here, "Montreal_background.jpg")
+ottawa_path = os.path.join(here, "Ottawa_background.jpg")
+quebec_path = os.path.join(here, "quebec_background.jpg")
+regina_path = os.path.join(here, "regina_background.jpg")
+resolute_path = os.path.join(here, "Resolute_background.jpg")
+saint_path = os.path.join(here, "saint_john_background.jpg")
+saskatoon_path = os.path.join(here, "saskatoon_background.jpg")
+john_path = os.path.join(here, "st_john's_background.jpg")
+summerside_path = os.path.join(here, "summerside_background.jpg")
+toronto_path = os.path.join(here, "Toronto_background.jpg")
+vancouver_path = os.path.join(here, "vancouver_background.jpg")
+victoria_path = os.path.join(here, "Victoria_background.jpg")
+whitehorse_path = os.path.join(here, "whitehorse_background.jpg")
+winnipeg_path = os.path.join(here, "winnipeg_background.jpg")
+yellowknife_path = os.path.join(here, "yellowknife_background.jpg")
+background_image = Image(file = image_path)
+
+
+
+#MULTITHREADING
 
 class clientThread (threading.Thread): #Thread for running client - server communication behind GUI
   def __init__(self, threadID, name, counter):
@@ -54,12 +101,6 @@ def chat_client(host,port):
   global received
   global received_city
   global received_alias
-  
-  #if(len(sys.argv) < 3): #MIGHT STILL WANT ALL OF THIS
-  # print 'Usage : python chat_client.py hostname port'
-  # sys.exit()
-  #host = sys.argv[1] #MIGHT STILL WANT TO IMPLEMENT THIS FOR SYSTEM 
-  #port = int(sys.argv[2])
      
   server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   server_socket.settimeout(2)
@@ -113,46 +154,6 @@ def chat_client(host,port):
 
 
 #GUI CODE USING PYGUI
-
-#list of all the different chat rooms - 2 of each city per province + Detroit
-free_cities = ["Detroit" , "Montreal", "Vancouver", "Victoria", "Calgary", "Edmonton", "Quebec City", "Ottawa", "Toronto", "Winnipeg", "Churchill", "Saskatoon", "Regina", "Yellowknife", "Whitehorse", "Dawson City", "Fort Simson", "Iqaluit", "Resolute", "Fredericton", "Saint John", "Halifax", "Dartmouth", "St. Johns", "Grand Falls-Windsor", "Charlottetown", "Summerside"]
-Alias_MAX = 10 #
-test_counter = 1
-current_city = "Earth" #Default chatroom for the system, also acts as global message sender
-current_alias = "Anonymus" #Default alias for the alias system
-
-
-#ALL THE PATHING FOR SWITCHING THE BACKGROUND FOR EACH CHAT ROOM
-here = sys.path[0]
-image_path = os.path.join(here, "earth_background.jpg")
-calgary_path = os.path.join(here, "Calgary_background.jpg")
-charlottetown_path = os.path.join(here, "charlottetown_background.jpg")
-churchill_path = os.path.join(here, "churchill_background.jpg")
-dartmouth_path = os.path.join(here, "dartmouth_background.jpg")
-dawson_path = os.path.join(here, "Dawson_city_background.jpg")
-detroit_path = os.path.join(here, "detroit_background.jpg")
-edmonton_path = os.path.join(here, "Edmonton_background.jpg")
-simson_path = os.path.join(here, "Fort_simson_background.jpg")
-fredericton_path = os.path.join(here, "fredericton_background.jpg")
-windsor_path = os.path.join(here, "Grand_falls_windsor_background.jpg")
-halifax_path = os.path.join(here, "Halifax_background.jpg")
-iqaluit_path = os.path.join(here, "iqaluit_background.jpg")
-montreal_path = os.path.join(here, "Montreal_background.jpg")
-ottawa_path = os.path.join(here, "Ottawa_background.jpg")
-quebec_path = os.path.join(here, "quebec_background.jpg")
-regina_path = os.path.join(here, "regina_background.jpg")
-resolute_path = os.path.join(here, "Resolute_background.jpg")
-saint_path = os.path.join(here, "saint_john_background.jpg")
-saskatoon_path = os.path.join(here, "saskatoon_background.jpg")
-john_path = os.path.join(here, "st_john's_background.jpg")
-summerside_path = os.path.join(here, "summerside_background.jpg")
-toronto_path = os.path.join(here, "Toronto_background.jpg")
-vancouver_path = os.path.join(here, "vancouver_background.jpg")
-victoria_path = os.path.join(here, "Victoria_background.jpg")
-whitehorse_path = os.path.join(here, "whitehorse_background.jpg")
-winnipeg_path = os.path.join(here, "winnipeg_background.jpg")
-yellowknife_path = os.path.join(here, "yellowknife_background.jpg")
-background_image = Image(file = image_path)
 
 
 #ALL THE CORE FUNCTIONS FOR BUTTON USAGE
@@ -294,6 +295,24 @@ def test(): #Testing the sending of shared data between the threads - this is wh
   print received_city
   print received
 
+def queue_refresh(message):
+  global message_queue
+  global temp_message_queue
+  global line_counter
+  for i in range(0,1):
+    discard = message_queue.get()
+    line_counter -= 1
+  window.output_field.value = ""
+  while not message_queue.empty():
+    pop = message_queue.get()
+    temp_message_queue.put(pop)
+    print "DEBUG"
+    window.output_field.value = window.output_field.text + pop + '\n'
+  while not temp_message_queue.empty():
+    message_queue.put(temp_message_queue.get())
+  message_queue.put(message)
+  window.output_field.value = window.output_field.text + message + '\n'
+
 def refresh_output_receive():
     global received
     global window
@@ -302,20 +321,24 @@ def refresh_output_receive():
     global line_counter
     global received_city
     global received_alias
-    line_counter += 1
-    print line_counter
-    if line_counter >= MAX_LINE:
-      print "Too many lines" #This is where we'd have to figure out how to remove the lines
-    else:
-      if len(received_city)<=0:
+    global message_queue
+    global temp_message_queue
+
+    if len(received_city)<=0:
         pass
-      else:
+    else:
         if received_city[0] == current_city or received_city[0] == "Earth":
-          window.output_field.value = window.output_field.text + '[' + received_alias[0] + '] ' + received[0] + '\n'
-          remove_window()
-          create_window()
-        else:
-          pass
+          temp_message = '[' + received_alias[0] + '] ' + received[0]
+          line_counter += 1
+          print line_counter
+          if line_counter >= MAX_LINE:
+            queue_refresh(temp_message)
+            print "Too many lines" #This is where we'd have to figure out how to remove the lines
+          else: 
+            message_queue.put(temp_message)
+            window.output_field.value = window.output_field.text + temp_message + '\n'
+            remove_window()
+            create_window()
 
 def refresh_output_send():
     global received
@@ -323,12 +346,17 @@ def refresh_output_send():
     global test_counter
     global MAX_LINE
     global line_counter
+    global message_queue
+    global temp_message_queue
     line_counter += 1
+    temp_sending = '[' + current_alias + '] ' +  window.input_field.text
     print line_counter
     if line_counter >= MAX_LINE:
+      queue_refresh(temp_sending)
       print "Too many lines" # - same thing as the recieving
     else:
-      window.output_field.value = window.output_field.text + '[' + current_alias + '] ' +  window.input_field.text + '\n'
+      message_queue.put(temp_sending)
+      window.output_field.value = window.output_field.text + temp_sending + '\n'
     remove_window()
     create_window()
 
