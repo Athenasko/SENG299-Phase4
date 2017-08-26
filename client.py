@@ -1,4 +1,4 @@
-#copied Socket Client segement 
+#Socket Client segment provided by Caleb Shortt.
 import socket
 s = socket.socket()
 host = socket.gethostname()
